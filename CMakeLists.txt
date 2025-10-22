@@ -7,4 +7,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(tedit src/main.cpp)
 
 target_include_directories(tedit PRIVATE include)
-target_sources(tedit PRIVATE src/editor.cpp src/editor.h)
+target_sources(tedit PRIVATE src/editor.cpp src/editor.h src/syntax.h src/syntax.cpp src/json.hpp)

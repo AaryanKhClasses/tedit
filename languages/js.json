@@ -1,0 +1,18 @@
+{
+	"name": "JavaScript",
+	"extensions": [".js", ".mjs", ".cjs", ".jsx", ".es", ".es6"],
+	"keywords": [
+		"import", "export", "from", "as", "default",
+		"var", "let", "const",
+		"function", "return",
+		"if", "else", "switch", "case",
+		"for", "while", "do", "break", "continue",
+		"try", "catch", "finally", "throw",
+		"new", "delete", "typeof", "instanceof", "void",
+		"this", "super", "class", "extends", "constructor", "static", "get", "set",
+		"await", "async", "yield",
+		"true", "false", "null", "undefined",
+		"in", "of", "with", "debugger"
+	],
+	"singleLineComments": "//"
+}

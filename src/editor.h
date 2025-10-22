@@ -1,4 +1,5 @@
 #pragma once
+#include "syntax.h"
 #include <string>
 #include <vector>
 #include <chrono>
@@ -34,4 +35,6 @@ class Editor {
         string fileName = "[No Name]";
         string statusMessage;
         chrono::steady_clock::time_point statusTime;
+
+        vector<vector<int>> hl;
 };

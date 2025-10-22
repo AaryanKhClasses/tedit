@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <regex>
 using namespace std;
 
 Editor::Editor() : cursorX(0), cursorY(0) {
@@ -97,8 +98,26 @@ void Editor::drawRows() {
             else cout << "~\r\n"; // Empty Line Indicator
         }
         else {
-            string line = rows[fileRow];
-            if((int)line.size() > colOffset) cout << line.substr(colOffset, screenCols);
+            Syntax::updateSyntax(rows, hl, fileRow);
+            string& line = rows[fileRow];
+
+            int len = line.size() > colOffset ? line.size() - colOffset : 0;
+            int drawLen = len < screenCols ? len : screenCols;
+
+            for(int i = 0; i < drawLen; i++) {
+                int hlType = 0;
+                if((int)hl[fileRow].size() > i + colOffset) hlType = hl[fileRow][i + colOffset];
+                switch(hlType) {
+                    case 0: cout << "\x1b[39m"; break;
+                    case 1: cout << "\x1b[" + Syntax::currentTheme.colors["keyword"] + "m"; break;
+                    case 2: cout << "\x1b[" + Syntax::currentTheme.colors["number"] + "m"; break;
+                    case 3: cout << "\x1b[" + Syntax::currentTheme.colors["string"] + "m"; break;
+                    case 4: cout << "\x1b[" + Syntax::currentTheme.colors["comment"] + "m"; break;
+                }
+                cout << line[i + colOffset];
+            }
+
+            cout << "\x1b[39m"; // Reset to normal color
             cout << "\x1b[K\r\n"; // Clear line after content
         }
     }
@@ -174,6 +193,12 @@ void Editor::openFile(const string& name) {
     }
 
     if(rows.empty()) rows.push_back("");
+
+    Syntax::loadLanguage(fileName);
+    Syntax::loadTheme("default");
+    hl.assign(rows.size(), vector<int>());
+    for(int i = 0; i < (int)rows.size(); i++) Syntax::updateSyntax(rows, hl, i);
+
     setStatusMessage("File loaded successfully.");
 }
 

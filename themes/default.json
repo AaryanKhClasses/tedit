@@ -1,0 +1,11 @@
+{
+    "name": "Default",
+    "colors": {
+        "keyword": "38;5;92",
+        "number": "38;5;173",
+        "string": "38;5;10",
+        "comment": "90",
+        "text": "37",
+        "background": "40"
+    }
+}

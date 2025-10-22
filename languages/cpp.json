@@ -1,0 +1,20 @@
+{
+    "name": "C++",
+    "extensions": [".cpp", ".c", ".hpp", ".h", ".cxx", ".hxx", ".cc", ".hh"],
+    "keywords": [
+        "include", "using", "namespace", "export",
+        "bool", "char", "char8_t", "char16_t", "char32_t", "int", "long", "short", "signed", "unsigned", "float", "double", "void", "wchar_t",
+        "if", "else", "switch", "case", "default", "for", "while", "do", "break", "continue", "goto",
+        "true", "false", "nullptr",
+        "new", "delete", "sizeof", "alignas", "alignof",
+        "class", "struct", "union", "enum", "friend", "mutable", "this", "public", "private", "protected",
+        "inline", "explicit", "virtual", "override", "final", "constexpr", "consteval", "constinit", "operator", "typedef", "using", "typename",
+        "template", "concept", "requires",
+        "try", "catch", "throw", "noexcept",
+        "const_cast", "dynamic_cast", "reinterpret_cast", "static_cast", "decltype", "typeid",
+        "const", "static", "static_assert", "extern", "register", "thread_local", "volatile",
+        "and", "and_eq", "or", "or_eq", "not", "not_eq", "bitand", "bitor", "compl", "xor", "xor_eq",
+        "asm", "auto", "return", "sizeof", "co_await", "co_return", "co_yield"
+    ],
+    "singleLineComments": "//"
+}
