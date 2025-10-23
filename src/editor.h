@@ -20,8 +20,30 @@ class Editor {
         void openFile(const string& name);
         void saveFile();
         void saveFileAs();
+        void renameFile();
         
     private:
+        // Undo/Redo support
+        enum class ActionType { InsertText, DeleteRange, SplitLine, JoinLine };
+        struct Action {
+            ActionType type;
+            int y, x;                 // position reference
+            string text;              // inserted text or deleted text or suffix (for split)
+            string aux;               // auxiliary: indent for split, or unused
+            int beforeX = 0, beforeY = 0; // cursor before action
+            int afterX = 0, afterY = 0;   // cursor after action
+        };
+
+        void pushAction(const Action& a);
+        void applyForward(const Action& a);
+        void applyInverse(const Action& a);
+        void undo();
+        void redo();
+
+        // low-level text ops (no history recording)
+        void insertTextAt(int y, int x, const string& s);
+        void deleteRangeAt(int y, int x, int len);
+
         void drawRows();
         void drawContentRows(int numRows);
         void insertChar(char ch);
@@ -41,4 +63,7 @@ class Editor {
         chrono::steady_clock::time_point statusTime;
 
         vector<vector<int>> hl;
+
+        vector<Action> undoStack;
+        vector<Action> redoStack;
 };
