@@ -15,18 +15,22 @@ enum EditorKey {
 class Editor {
     public:
         Editor();
-        void processKeypress();
+        bool processKeypress();
         void refreshScreen();
         void openFile(const string& name);
         void saveFile();
+        void saveFileAs();
         
     private:
         void drawRows();
+        void drawContentRows(int numRows);
         void insertChar(char ch);
+        int getIndentLevel(const string& line);
         void scroll();
         void drawStatusBar();
         void setStatusMessage(const string& msg);
         int readKey();
+        string promptForInput(const string& prompt);
 
         int cursorX, cursorY;
         int rowOffset = 0, colOffset = 0, screenRows = 24, screenCols = 80;

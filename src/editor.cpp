@@ -10,26 +10,39 @@ Editor::Editor() : cursorX(0), cursorY(0) {
     rows.push_back("");
 }
 
-void Editor::processKeypress() {
+bool Editor::processKeypress() {
     int key = readKey();
 
     switch(key) {
         case 17: // Ctrl-Q
             cout << "\x1b[2J\x1b[H"; // Clear screen
-            exit(0);
+            return false;
             break;
         case 19: // Ctrl-S
             saveFile();
             break;
+        case 23: // Ctrl-W
+            saveFileAs();
+            break;
+        case '\t': { // Tab Key
+            for(int i = 0; i < 4; i++) insertChar(' ');
+            break;
+        }
         case '\r': { // Enter Key
             string newLine = "";
             if(cursorX < (int)rows[cursorY].size()) {
                 newLine = rows[cursorY].substr(cursorX);
                 rows[cursorY] = rows[cursorY].substr(0, cursorX);
             }
+            
+            // Auto-indent: copy indentation from current line
+            int indentLevel = getIndentLevel(rows[cursorY]);
+            string indent(indentLevel, ' ');
+            newLine = indent + newLine;
+            
             rows.insert(rows.begin() + cursorY + 1, newLine);
             cursorY++;
-            cursorX = 0;
+            cursorX = indentLevel;
             break;
         } case 127: // Backspace
         case 8:   // Ctrl-H
@@ -70,7 +83,8 @@ void Editor::processKeypress() {
             break;
     }
 
-    if(key != 19) setStatusMessage("");
+    if(key != 19 && key != 23) setStatusMessage("");
+    return true;
 }
 
 void Editor::insertChar(char ch) {
@@ -78,6 +92,16 @@ void Editor::insertChar(char ch) {
     if(cursorX > (int)rows[cursorY].size()) cursorX = rows[cursorY].size();
     rows[cursorY].insert(rows[cursorY].begin() + cursorX, ch);
     cursorX++;
+}
+
+int Editor::getIndentLevel(const string& line) {
+    int indent = 0;
+    for(char ch : line) {
+        if(ch == ' ') indent++;
+        else if(ch == '\t') indent += 4;
+        else break;
+    }
+    return indent;
 }
 
 void Editor::refreshScreen() {
@@ -91,11 +115,18 @@ void Editor::refreshScreen() {
 }
 
 void Editor::drawRows() {
-    for(int y = 0; y < screenRows; y++) {
+    drawContentRows(screenRows);
+}
+
+void Editor::drawContentRows(int numRows) {
+    for(int y = 0; y < numRows; y++) {
         int fileRow = y + rowOffset;
         if(fileRow >= (int)rows.size()) {
-            if(y == screenRows - 1) drawStatusBar();
-            else cout << "~\r\n"; // Empty Line Indicator
+            if(y == numRows - 1 && numRows == screenRows) drawStatusBar();
+            else {
+                cout << "~";
+                if(y < numRows - 1) cout << "\r\n";
+            }
         }
         else {
             Syntax::updateSyntax(rows, hl, fileRow);
@@ -118,7 +149,8 @@ void Editor::drawRows() {
             }
 
             cout << "\x1b[39m"; // Reset to normal color
-            cout << "\x1b[K\r\n"; // Clear line after content
+            cout << "\x1b[K"; // Clear line after content
+            if(y < numRows - 1) cout << "\r\n";
         }
     }
 }
@@ -212,8 +244,59 @@ void Editor::saveFile() {
         setStatusMessage("Could not save file!");
         return;
     }
-    for(const auto& line : rows) {
-        file << line << "\n";
-    }
+    for(const auto& line : rows) file << line << "\n";
     setStatusMessage("File saved successfully.");
+}
+
+void Editor::saveFileAs() {
+    string newFileName = promptForInput("Save as: ");
+    if(newFileName.empty()) {
+        setStatusMessage("Save as aborted.");
+        return;
+    }
+
+    fileName = newFileName;
+    ofstream file(fileName);
+    if(!file) {
+        setStatusMessage("Could not save file!");
+        return;
+    }
+    for(const auto& line : rows) file << line << "\n";
+
+    Syntax::loadLanguage(fileName);
+    Syntax::loadTheme("default");
+    hl.assign(rows.size(), vector<int>());
+    for(int i = 0; i < (int)rows.size(); i++) Syntax::updateSyntax(rows, hl, i);
+
+    setStatusMessage("File saved as " + fileName);
+}
+
+string Editor::promptForInput(const string& prompt) {
+    string input = "";
+
+    while(true) {
+        // Clear screen and draw content rows (excluding status bar)
+        cout << "\x1b[2J\x1b[H";
+        drawContentRows(screenRows - 1);
+        
+        cout << "\r\n\x1b[K"; // New line and clear line
+        cout << "\x1b[7m"; // Invert colors
+        string status = prompt + input;
+        if((int)status.size() > screenCols) status = status.substr(0, screenCols);
+        cout << status;
+        for(int i = status.size(); i < screenCols; i++) cout << " ";
+        cout << "\x1b[m\x1b[K"; // Reset formatting and clear to end
+        
+        // Position cursor at end of input on status bar
+        int cursorCol = prompt.length() + input.length() + 1;
+        cout << "\x1b[" << screenRows << ";" << cursorCol << "H";
+        cout << "\x1b[?25h"; // Show cursor
+        cout.flush();
+
+        int key = readKey();
+        if(key == '\r') return input; // Enter
+        else if(key == 27) return ""; // Escape
+        else if(key == 127 || key == 8) if(!input.empty()) input.pop_back(); // Backspace
+        else if(isprint(key)) input += (char)key;
+    }
 }

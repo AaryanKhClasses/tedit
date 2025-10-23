@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 
     while(true) {
         editor.refreshScreen();
-        editor.processKeypress();
+        if(!editor.processKeypress()) break;
     }
     return 0;
 }
