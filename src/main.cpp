@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include "editor.h"
+#include "syntax.h"
 using namespace std;
 
 class RawMode {
@@ -28,6 +29,7 @@ class RawMode {
 };
 
 int main(int argc, char* argv[]) {
+    if(argc >= 1 && argv[0]) Syntax::setExecutablePath(argv[0]);
     RawMode rawMode;
     Editor editor;
 

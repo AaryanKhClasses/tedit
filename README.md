@@ -33,6 +33,14 @@ make
 ```bash
 ./tedit ./test/test.cpp
 ```
+6. Install the binary to a system-wide location (optional):
+```bash
+sudo make install
+```
+or
+```bash
+sudo cp tedit /usr/bin/
+```
 
 > [!NOTE]
 > If you don't want to build from source, you can download pre-built binaries from the [Releases](https://github.com/AaryanKhClasses/tedit/releases) page.

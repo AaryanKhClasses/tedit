@@ -22,6 +22,7 @@ class Syntax {
     public:
         static Language currentLanguage;
         static Theme currentTheme;
+        static void setExecutablePath(const std::string& argv0);
         static void loadLanguage(const string& filename);
         static void loadTheme(const string& filename);
         static void updateSyntax(vector<string>& rows, vector<vector<int>>& hl, int row);
